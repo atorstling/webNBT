@@ -16,29 +16,29 @@
 # To install in $HOME instead of /usr/local, use:
 #    make install prefix=$HOME
 
-CC=/Users/alex/emsdk_portable/emscripten/1.25.0/emcc
+CC=gcc
 
-CFLAGS= -D_LARGEFILE64_SOURCE=1 -DNO_STRERROR
+CFLAGS=-O3  -DHAVE_HIDDEN
 #CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
 #CFLAGS=-g -DDEBUG
 #CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
 #           -Wstrict-prototypes -Wmissing-prototypes
 
-SFLAGS= -D_LARGEFILE64_SOURCE=1 -DNO_STRERROR
-LDFLAGS=
+SFLAGS=-O3  -fPIC -DHAVE_HIDDEN
+LDFLAGS= 
 TEST_LDFLAGS=-L. libz.a
-LDSHARED=/Users/alex/emsdk_portable/emscripten/1.25.0/emcc
-CPP=/Users/alex/emsdk_portable/emscripten/1.25.0/emcc -E
+LDSHARED=gcc -dynamiclib -install_name ${exec_prefix}/lib/libz.1.dylib -compatibility_version 1 -current_version 1.2.8
+CPP=gcc -E
 
 STATICLIB=libz.a
-SHAREDLIB=
-SHAREDLIBV=
-SHAREDLIBM=
+SHAREDLIB=libz.dylib
+SHAREDLIBV=libz.1.2.8.dylib
+SHAREDLIBM=libz.1.dylib
 LIBS=$(STATICLIB) $(SHAREDLIBV)
 
-AR=/Users/alex/emsdk_portable/emscripten/1.25.0/emar
-ARFLAGS=rc
-RANLIB=/Users/alex/emsdk_portable/emscripten/1.25.0/emranlib
+AR=libtool
+ARFLAGS=-o
+RANLIB=ranlib
 LDCONFIG=ldconfig
 LDSHAREDLIBC=-lc
 TAR=tar
@@ -70,7 +70,7 @@ OBJS = $(OBJC) $(OBJA)
 
 PIC_OBJS = $(PIC_OBJC) $(PIC_OBJA)
 
-all: static all64
+all: static shared
 
 static: example$(EXE) minigzip$(EXE)
 
@@ -80,7 +80,7 @@ all64: example64$(EXE) minigzip64$(EXE)
 
 check: test
 
-test: all teststatic test64
+test: all teststatic testshared
 
 teststatic: static
 	@TMPST=tmpst_$$; \
